@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "recipie"
+version = "0.0.1"
+authors = [
+  { name="Harvey Pham" },
+]
+description = "Python idoms and recipes"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/harveypham/recipie"
+"Bug Tracker" = "https://github.com/harveypham/recipie/issues"
