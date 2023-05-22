@@ -58,7 +58,7 @@ with rollback(undo, data):
 
 ## functools
 
-### default_on_error(value, errors)
+### @default_on_error(value, errors)
 
 Create a function that returns the specified *value* if *errors* is raised.
 
@@ -73,7 +73,7 @@ value = get_from_dict(d, "Test") # Value is None when "Test" is not in d
 
 ```
 
-### retry(tries, errors, error_filter, delay_gen, log_error)
+### @retry(tries, errors, error_filter, delay_gen, log_error)
 
 Retries function *tries* times if encounter an error that matches errors and error_filter
 
