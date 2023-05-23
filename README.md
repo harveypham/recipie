@@ -20,7 +20,7 @@ from recipie.contextlib import *
 
 ### commit(func, *args, **kwargs) [0.0.1]
 
-Executes *func* if the code ran to completion:
+Executes *func* if the code ran to completion without any error:
 
 Example:
 
@@ -52,7 +52,6 @@ with rollback(undo, data):
     ...
 ```
 
-* Available since v0.0.1
 * Also see ***commit***
 
 ## functools
