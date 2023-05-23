@@ -18,7 +18,7 @@ from recipie.contextlib import *
 
 ## contextlib
 
-### commit(func, *args, **kwargs)
+### commit(func, *args, **kwargs) [0.0.1]
 
 Executes *func* if the code ran to completion:
 
@@ -35,10 +35,9 @@ with commit(save_data, data):
     # save_data is called if there is no error
 ```
 
-* Available since v0.0.1
 * Also see ***rollback***
 
-###rollback(func, *args, **kwargs)
+### rollback(func, *args, **kwargs) [0.0.1]
 
 Executes *func* if when encouter error
 
@@ -58,9 +57,13 @@ with rollback(undo, data):
 
 ## functools
 
-### @default_on_error(value, errors)
+### @default_on_error(value, errors) [0.0.1]
 
 Create a function that returns the specified *value* if *errors* is raised.
+
+*value*: Default value to return on error
+
+*errors*: Error or tuple of errors to check for
 
 Example:
 
@@ -73,7 +76,7 @@ value = get_from_dict(d, "Test") # Value is None when "Test" is not in d
 
 ```
 
-### @retry(tries, errors, error_filter, delay_gen, log_error)
+### @retry(tries, errors, error_filter, delay_gen, log_error) [0.0.1]
 
 Retries function *tries* times if encounter an error that matches errors and error_filter
 
@@ -100,3 +103,5 @@ def get_db_connection():
 
 conn = get_db_connection() # Automatically retry on network error
 ```
+
+* Either *errors* or *error_filter* must be specified
