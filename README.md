@@ -52,13 +52,47 @@ with rollback(undo, data):
     ...
 ```
 
-* Also see ***commit***
+* Also see ***commit
+
+### Buffer
+Accumulates data into a buffer to be processed when the buffer is full.
+
+Example:
+
+```
+def save_data(data: list[int]):
+    ...
+
+with Buffer(1000, save_data) as buffer:
+    for i in range(1500):
+        buffer.add(i) # On 1001th item, called save_data to save previous 1000 items
+# When out of context, call save_data on the last 500 items
+```
 
 ## functools
 
+### @scoped
+
+*"Namespaces are one honking great idea -- let's do more of those!"*
+
+
+Decorates a function to make it part of another namespace
+
+
+Examples:
+'''
+def retry():
+    ...
+
+# retry.no_delay
+@scoped(retry)
+def no_delay():
+    ...
+'''
+
 ### @default_on_error(value, errors) [0.0.1]
 
-Create a function that returns the specified *value* if *errors* is raised.
+Decorates a function to return the specified *value* if *errors* is raised.
 
 *value*: Default value to return on error
 
@@ -75,6 +109,10 @@ value = get_from_dict(d, "Test") # Value is None when "Test" is not in d
 
 ```
 
+### @skip_on_error(errors) [0.0.1]
+
+Decorates a function to return None if *errors* is raised (equivalent to @default_on_error(None, errors)
+
 ### @retry(tries, errors, error_filter, delay_gen, log_error) [0.0.1]
 
 Retries function *tries* times if encounter an error that matches errors and error_filter
@@ -89,9 +127,9 @@ Retries function *tries* times if encounter an error that matches errors and err
 *delay_gen*: Delay generator that produce an iterator of delay values for
 use between attempts. Several predefined delay scheme:
 
-* no_delay: No delay between calls (Delay values are [0, 0, 0, 0, ...]
-* const_delay(5): Delay five seconds every time (Delay values are [5, 5, 5, 5, ...]
-* exp_delay(5, 100): Delays values are [5, 10, 20, 40, ... 5 * 2 ^ (n - 1)]
+* retry.no_delay (default): No delay between calls (equivalent to retry.const_delay(0)).
+* retry.const_delay(5): Delay five seconds every time (Delay values are [5, 5, 5, 5, ...]
+* retry.exp_delay(5, 100): Delays values are [5, 10, 20, 40, ... 5 * 2 ^ (n - 1)]
 
 Example:
 
