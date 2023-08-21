@@ -150,6 +150,6 @@ conn = get_db_connection() # Automatically retry on network error
 3. **retry.expo_backoff(base, cap, jitter)**: exponential backoff delay. With no jitter, values
 are *max(base * 2 ^ n*, cap).
    
-    * *no_jitter*: (default) actual delay is fixed at the calculated value
-    * *half_jitter*: actual delay is randomly picked from [value/2, value)
-    * *full_jitter*: actual delay is randomly picked from [0, value)
+    * *retry.no_jitter*: (default) actual delay is fixed at the calculated value
+    * *retry.half_jitter*: actual delay is randomly picked from [value/2, value)
+    * *retry.full_jitter*: actual delay is randomly picked from [0, value)
