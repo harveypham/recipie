@@ -127,12 +127,7 @@ Retries function *tries* times if encounter an error that matches errors and err
 **True** if it is a retriable error
 
 *delay_gen*: Delay generator that produce an iterator of delay values for
-use between attempts. Several predefined delay scheme:
-
-* retry.no_delay (default): No delay between calls (equivalent to retry.const_delay(0)).
-* retry.const_delay(5): Delay five seconds every time (Delay values are [5, 5, 5, 5, ...]
-* retry.exp_delay(5, 100): Delays values are [5, 10, 20, 40, ... 5 * 2 ^ (n - 1)]
-
+use between attempts.
 Example:
 
 ```
@@ -144,3 +139,18 @@ conn = get_db_connection() # Automatically retry on network error
 ```
 
 * Either *errors* or *error_filter* must be specified
+
+#### Predefined delay policies:
+
+1. *retry.no_delay*: No delay between attempts. This is picked up when no delay policy specified.
+   It is equivalent to *retry.const_delay(0)*.
+
+2. *retry.const_delay(delay)*: Delay in seconds as specified by *delay*
+
+3. retry.expo_backoff(base, cap, jitter): exponential backoff delay. With no jitter, values
+are *max(base * 2 ^ n*, cap).
+   
+    * no_jitter: (default) actual delay is fixed at the calculated value
+    * half_jitter: actual delay is randomly picked from [value/2, v)
+    * full_jitter: actual delay is randomly picked from [0, value)
+
