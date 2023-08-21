@@ -142,15 +142,14 @@ conn = get_db_connection() # Automatically retry on network error
 
 #### Predefined delay policies:
 
-1. *retry.no_delay*: No delay between attempts. This is picked up when no delay policy specified.
+1. **retry.no_delay**: No delay between attempts. This is picked up when no delay policy specified.
    It is equivalent to *retry.const_delay(0)*.
 
-2. *retry.const_delay(delay)*: Delay in seconds as specified by *delay*
+2. **retry.const_delay(delay)**: Delay in seconds as specified by *delay*
 
-3. retry.expo_backoff(base, cap, jitter): exponential backoff delay. With no jitter, values
+3. **retry.expo_backoff(base, cap, jitter)**: exponential backoff delay. With no jitter, values
 are *max(base * 2 ^ n*, cap).
    
-    * no_jitter: (default) actual delay is fixed at the calculated value
-    * half_jitter: actual delay is randomly picked from [value/2, v)
-    * full_jitter: actual delay is randomly picked from [0, value)
-
+    * *no_jitter*: (default) actual delay is fixed at the calculated value
+    * *half_jitter*: actual delay is randomly picked from [value/2, value)
+    * *full_jitter*: actual delay is randomly picked from [0, value)
