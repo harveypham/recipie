@@ -65,7 +65,8 @@ def save_data(data: list[int]):
 
 with Buffer(1000, save_data) as buffer:
     for i in range(1500):
-        buffer.add(i) # On 1001th item, called save_data to save previous 1000 items
+        buffer.add(i)
+        # On 1001th item, called save_data to save previous 1000 items
 # When out of context, call save_data on the last 500 items
 ```
 
@@ -80,15 +81,16 @@ Decorates a function to make it part of another namespace
 
 
 Examples:
-'''
+
+```
 def retry():
     ...
 
-# retry.no_delay
+# Put no_delay under "retry" so it can only be refered to as retry.no_delay
 @scoped(retry)
 def no_delay():
     ...
-'''
+```
 
 ### @default_on_error(value, errors) [0.0.1]
 
