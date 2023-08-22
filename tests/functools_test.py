@@ -6,6 +6,23 @@ from _context import recipie
 from recipie.functools import *
 
 
+class AttribSpec(unittest.TestCase):
+    def testAttribAddFunctionToNameSpace(self):
+
+        def outer():
+            return "outer"
+
+        @attrib(outer)
+        def inner():
+            return "inner"
+
+        self.assertEqual(outer(), "outer")
+        self.assertEqual(outer.inner(), "inner")
+
+        with self.subTest("Inner is not accessible at the global space"):
+            self.assertRaises(NameError, inner)
+
+
 class DefaultOnErrorSpec(unittest.TestCase):
 
     @default_on_error(1, AssertionError)    
@@ -100,7 +117,7 @@ class RetrySpec(unittest.TestCase):
         tries = 3
         reject_all = lambda x: False
 
-        target = retry(tries, ValueError, log_error=log, error_filter=reject_all)(func)
+        target = retry(tries, ValueError, delay_gen=retry.no_delay, log_error=log, error_filter=reject_all)(func)
 
         self.assertRaises(ValueError, target)
         func.assert_called_once()
