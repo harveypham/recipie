@@ -4,7 +4,7 @@ from functools import *
 from typing import Any, Callable, Generator, Optional, Union, Type, Tuple
 
 
-def scoped(outer: Callable):
+def scoped(outer: callable):
 
     def wrapper(func):
         setattr(outer, func.__name__, func)
@@ -21,7 +21,7 @@ def no_op(*args, **kwargs):
     pass
 
 
-def default_on_error(default: Any, errors: Union[Type[Exception], Tuple[Type[Exception]]] = Exception):
+def default_on_error(default: any, errors: Union[Type[Exception], Tuple[Type[Exception]]] = Exception):
     def wrapper(func):
 
         @wraps(func)
@@ -41,7 +41,7 @@ skip_on_error = partial(default_on_error, None)
 def retry(
         tries: int,
         errors: Union[None, Type[Exception], Tuple[Type[Exception]]] = None,
-        error_filter: Optional[Callable] = None,
+        error_filter: Optional[callable] = None,
         delay_gen: Optional[Generator[int, None, None]] = None,
         log_error: Optional[Callable] = None):
     import time
@@ -100,7 +100,7 @@ def full_jitter(v: int):
     return uniform(0, v)
 
 @scoped(retry)
-def expo_backoff(base: int, cap: int, jitter: Callable = no_jitter):
+def expo_backoff(base: int, cap: int, jitter: callable = no_jitter):
     def _expo_backoff():
         expo = 1
         while True:

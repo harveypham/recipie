@@ -18,6 +18,19 @@ from recipie.contextlib import *
 
 ## contextlib
 
+### cleanup(func, *args, **kwargs) [0.0.3]
+
+Executes a clean up task on exiting context. The clean up task can be canceled.
+
+Example:
+
+```
+with cleanup(undo, arg) as cleanup_task:
+    result = action()
+    if result:
+        cleanup_task.cancel()
+```
+
 ### commit(func, *args, **kwargs) [0.0.1]
 
 Executes *func* if the code ran to completion without any error:
@@ -54,7 +67,8 @@ with rollback(undo, data):
 
 * Also see ***commit
 
-### Buffer
+### Buffer [0.0.2]
+
 Accumulates data into a buffer to be processed when the buffer is full.
 
 Example:
@@ -72,7 +86,7 @@ with Buffer(1000, save_data) as buffer:
 
 ## functools
 
-### @scoped
+### @scoped [0.0.2]
 
 *"Namespaces are one honking great idea -- let's do more of those!"*
 
