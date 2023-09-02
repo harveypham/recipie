@@ -1,30 +1,36 @@
 from contextlib import *
-from typing import Callable, Any
+from functools import partial as _partial
 
 
-class _func_wrap(AbstractContextManager):
-    def __init__(self, func: Callable, *args, **kwargs):
-        from functools import partial
-        self._func = partial(func, *args, **kwargs)
+class cleanup(AbstractContextManager):
+    def __init__(self, func: callable, *args, **kwargs):
+        self._func = _partial(func, *args, **kwargs) if args or kwargs else func
+    
+    def __exit__(self, *_):
+        self._func()
 
-class rollback(_func_wrap):
-    def __exit__(self, exc_type, exc_value, traceback):
+    def cancel(self):
+        self._func = lambda: None
+
+class rollback(AbstractContextManager, _partial):
+    def __exit__(self, exc_type, *_):
         if exc_type is not None:
-            self._func()
+            self.__call__()
 
-class commit(_func_wrap):
-    def __exit__(self, exc_type, exc_value, traceback):
+class commit(AbstractContextManager, _partial):
+    def __exit__(self, exc_type, *_):
         if exc_type is None:
-            self._func()
+            self.__call__()
+
 
 class Buffer(AbstractContextManager):
-    def __init__(self, size: int, func: Callable):
+    def __init__(self, size: int, func: callable):
         assert size > 1, "size must be more than one"
         self._size = size
         self._func = func
         self._buffer = []
 
-    def append(self, item: Any):
+    def append(self, item: any):
         if len(self._buffer) == self._size:
             self._func(self._buffer)
             self._buffer = [item]
@@ -38,10 +44,10 @@ class Buffer(AbstractContextManager):
 
     def extend(self, items:list):
         if items:
-            temp = self._buffer + items
-            *extra, self._buffer = [temp[i:i+self._size] for i in range(0, len(temp), self._size)]
-            for s in extra:
-                self._func(s)
+            all_items = self._buffer + items
+            *pages, self._buffer = [all_items[i:i+self._size] for i in range(0, len(all_items), self._size)]
+            for page in pages:
+                self._func(page)
 
-    def __exit__(self, exec_type, exec_value, traceback):
+    def __exit__(self, *_):
         self.clear()

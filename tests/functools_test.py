@@ -12,7 +12,7 @@ class AttribSpec(unittest.TestCase):
         def outer():
             return "outer"
 
-        @attrib(outer)
+        @scoped(outer)
         def inner():
             return "inner"
 

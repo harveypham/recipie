@@ -12,9 +12,9 @@ class RollbackSpec(unittest.TestCase):
     def test_RollbackExecutesOnErrorAndPropagatesError(self):
         mock = Mock()
         with self.assertRaises(Exception):
-            with rollback(mock):
+            with rollback(mock, 1, 2, 3):
                 raise Exception("Intentional failure")
-        mock.assert_called_once()
+        mock.assert_called_once_with(1, 2, 3)
 
     def test_RollbackDoesNotExecuteOnNoError(self):
         mock = Mock()
@@ -26,9 +26,9 @@ class CommitSpec(unittest.TestCase):
 
     def test_CommitExecutesOnNoError(self):
         mock = Mock()
-        with commit(mock):
+        with commit(mock, 1, 2, 3):
             pass
-        mock.assert_called_once()
+        mock.assert_called_once_with(1, 2, 3)
 
     def test_CommitDoesNotExecuteOnErrorAndPropagatesError(self):
         mock = Mock()
@@ -36,6 +36,28 @@ class CommitSpec(unittest.TestCase):
             with commit(mock):
                 raise Exception("Intentional failure")
         mock.assert_not_called()
+
+class CleanupSpec(unittest.TestCase):
+
+    def test_CleanupExecutesOnNoError(self):
+        mock = Mock()
+        with cleanup(mock, 1, 2, 3):
+            pass
+        mock.assert_called_once_with(1, 2, 3)
+
+    def test_CleanupExecutesOnError(self):
+        mock = Mock()
+        with self.assertRaises(AssertionError):
+            with cleanup(mock, 1, 2, 3):
+                assert False, "Intentional failure"
+        mock.assert_called_once_with(1, 2, 3)
+
+    def test_CleanupDoesNotExecuteIfCanceled(self):
+        mock = Mock()
+        with cleanup(mock, 1, 2, 3) as task:
+            task.cancel()
+        mock.assert_not_called()
+
 
 class BufferSpec(unittest.TestCase):
 
