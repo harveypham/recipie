@@ -48,6 +48,17 @@ with commit(save_data, data):
     # save_data is called if there is no error
 ```
 
+* Combine commit and rollback action as follow:
+    ```
+    def save_data(data):
+        ...
+    def revert_data(data):
+        ...
+
+    with commit(save_data, data), rollback(revert_data, data):
+        # other actions
+        ...
+    ```
 * Also see ***rollback***
 
 ### rollback(func, *args, **kwargs) [0.0.1]
