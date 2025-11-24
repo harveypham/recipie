@@ -6,7 +6,7 @@ from typing import Any, Callable, Generator, Optional, Union, Type, Tuple
 
 def scoped(outer: callable):
 
-    def wrapper(func):
+    def wrapper(func: callable):
         setattr(outer, func.__name__, func)
 
         @wraps(func)

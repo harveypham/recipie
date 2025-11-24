@@ -6,7 +6,7 @@ from _context import recipie
 from recipie.functools import *
 
 
-class AttribSpec(unittest.TestCase):
+class ScopedSpec(unittest.TestCase):
     def testAttribAddFunctionToNameSpace(self):
 
         def outer():
