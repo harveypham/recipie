@@ -31,7 +31,7 @@ class Buffer(AbstractContextManager):
         self._func = func
         self._buffer = []
 
-    def append(self, item: any):
+    def append(self, item: Any):
         if len(self._buffer) == self._size:
             self._func(self._buffer)
             self._buffer = [item]
