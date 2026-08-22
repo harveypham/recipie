@@ -1,9 +1,10 @@
 from contextlib import *
 from functools import partial as _partial
+from typing import Any, Callable
 
 
 class cleanup(AbstractContextManager):
-    def __init__(self, func: callable, *args, **kwargs):
+    def __init__(self, func: Callable, *args, **kwargs):
         self._func = _partial(func, *args, **kwargs) if args or kwargs else func
     
     def __exit__(self, *_):
@@ -24,7 +25,7 @@ class commit(AbstractContextManager, _partial):
 
 
 class Buffer(AbstractContextManager):
-    def __init__(self, size: int, func: callable):
+    def __init__(self, size: int, func: Callable):
         assert size > 1, "size must be more than one"
         self._size = size
         self._func = func
