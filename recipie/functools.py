@@ -1,10 +1,17 @@
 """ Extend functools """
 
 from functools import *
-from typing import Any, Callable, Generator, Optional, Union, Type, Tuple
+from typing import Any, Callable, Iterator, Optional, Union, Type, Tuple
 
 
-def scoped(outer: callable):
+def no_op(*args, **kwargs):
+    pass
+
+def no_filter(_):
+    return True
+
+
+def scoped(outer: Callable):
 
     def wrapper(func):
         setattr(outer, func.__name__, func)
@@ -17,19 +24,21 @@ def scoped(outer: callable):
     return wrapper
 
 
-def no_op(*args, **kwargs):
-    pass
-
-
-def default_on_error(default: any, errors: Union[Type[Exception], Tuple[Type[Exception]]] = Exception):
+def default_on_error(
+        default: Any,
+        errors: Union[Type[Exception], Tuple[Type[Exception]]] = Exception,
+        error_filter: Callable[[Exception], bool] = no_filter):
     def wrapper(func):
 
         @wraps(func)
         def _default_func(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
-            except errors:
-                return default;
+            except errors as e:
+                if error_filter(e):
+                    return default
+                else:
+                    raise
 
         return _default_func
 
@@ -41,8 +50,8 @@ skip_on_error = partial(default_on_error, None)
 def retry(
         tries: int,
         errors: Union[None, Type[Exception], Tuple[Type[Exception]]] = None,
-        error_filter: Optional[callable] = None,
-        delay_gen: Optional[Generator[int, None, None]] = None,
+        error_filter: Callable[[Exception], bool] = None,
+        delay_gen: Optional[Callable[[], Iterator[int]]] = None,
         log_error: Optional[Callable] = None):
     import time
 
@@ -51,19 +60,15 @@ def retry(
     assert errors is not None or error_filter is not None, \
         "Must specify error classes or error filter function"
 
-    def _all(e):
-        return True
-
     _errors = errors or Exception
-    _error_filter = error_filter or _all
+    _error_filter = error_filter or no_filter
     _log_error = log_error or no_op
-    _delay_gen = delay_gen or retry.no_delay
 
     def wrapper(func):
 
         @wraps(func)
         def _retry(*args, **kwargs):
-            delays = _delay_gen()
+            delays = (delay_gen or retry.no_delay)()
             for i in range(tries-1):
                 try:
                     return func(*args, **kwargs)
@@ -72,7 +77,7 @@ def retry(
                         raise
 
                     delay = next(delays)
-                    _log_error(f"Retrying error {str(e)} in {delay} seconds...")
+                    _log_error(f"Retrying error {str(e)} at {i} attempt in {delay} seconds...")
                     time.sleep(delay)
             return func(*args, **kwargs)
         return _retry
@@ -92,7 +97,8 @@ def no_jitter(v: int):
 
 @scoped(retry)
 def half_jitter(v: int):
-    return v/2 + retry.full_jitter(v/2)
+    from random import uniform
+    return v//2 + uniform(0, v//2 + v%2)
 
 @scoped(retry)
 def full_jitter(v: int):
@@ -100,10 +106,11 @@ def full_jitter(v: int):
     return uniform(0, v)
 
 @scoped(retry)
-def expo_backoff(base: int, cap: int, jitter: callable = no_jitter):
+def expo_backoff(base: int, cap: int, jitter: Callable = None):
+    _jitter = jitter if jitter is not None else retry.no_jitter
     def _expo_backoff():
         expo = 1
         while True:
-            yield jitter(min(expo * base, cap))
+            yield _jitter(min(expo * base, cap))
             expo *= 2
     return _expo_backoff

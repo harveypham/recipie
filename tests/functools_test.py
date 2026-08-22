@@ -122,3 +122,14 @@ class RetrySpec(unittest.TestCase):
         self.assertRaises(ValueError, target)
         func.assert_called_once()
         log.assert_not_called()
+
+
+class ExpoBackoffSpec(unittest.TestCase):
+
+    def testExpoBackoffDefaultJitterIsNoJitter(self):
+        # Verifies that omitting `jitter` uses no_jitter (identity), not the _disable stub.
+        # Bug: after @scoped(retry), module-level `no_jitter` is the _disable stub.
+        # If the default captures _disable, next(gen) will raise NameError instead of returning base.
+        gen = retry.expo_backoff(base=1, cap=100)()
+        self.assertEqual(next(gen), 1)   # first yield: jitter(min(1*1, 100)) == 1
+        self.assertEqual(next(gen), 2)   # second yield: jitter(min(2*1, 100)) == 2
